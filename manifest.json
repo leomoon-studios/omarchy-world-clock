@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "id": "io.github.leomoon-studios.world-clock",
+  "name": "Omarchy World Clock",
+  "version": "0.1.0",
+  "author": "Leo Moon Studios",
+  "license": "MIT",
+  "description": "An offline world clock and timezone converter for the Omarchy bar.",
+  "kinds": ["bar-widget"],
+  "entryPoints": {
+    "barWidget": "BarWidget.qml"
+  },
+  "barWidget": {
+    "displayName": "World Clock",
+    "description": "View and convert time across your chosen locations.",
+    "category": "Time",
+    "allowMultiple": false,
+    "defaultSection": "right",
+    "defaults": {
+      "hourFormat": "24",
+      "showAbbreviation": true,
+      "showUtcOffset": false,
+      "showTodayDate": false
+    }
+  }
+}

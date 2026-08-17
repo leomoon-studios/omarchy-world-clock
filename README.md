@@ -35,16 +35,20 @@ omarchy bar move io.github.leomoon-studios.world-clock --section right --after o
 ## Automation
 
 Locations and display settings live inline in `~/.config/omarchy/shell.json`.
-They can also be managed through supported Omarchy commands:
+Use the plugin's **Settings** panel to add, remove, reorder, or rename
+locations. This is the supported way to manage the location array.
+
+Scalar display preferences can also be automated with Omarchy commands:
 
 ```bash
-omarchy bar set io.github.leomoon-studios.world-clock locations \
-  '[{"label":"Vancouver","timezone":"America/Vancouver"},{"label":"London","timezone":"Europe/London"},{"label":"Tehran","timezone":"Asia/Tehran"}]' --json
-
 omarchy bar set io.github.leomoon-studios.world-clock hourFormat 24
 omarchy bar set io.github.leomoon-studios.world-clock showAbbreviation true --json
 omarchy bar set io.github.leomoon-studios.world-clock showUtcOffset false --json
 ```
+
+> Current Omarchy IPC releases cannot pass a JSON array through
+> `omarchy bar set … locations … --json`; do not use that command for
+> locations.
 
 ## Security and privacy
 

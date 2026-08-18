@@ -3,7 +3,7 @@
   "id": "io.github.leomoon-studios.world-clock",
   "name": "Omarchy World Clock",
   "version": "0.1.0",
-  "author": "Leo Moon Studios",
+  "author": "LeoMoon Studios",
   "license": "MIT",
   "description": "An offline world clock and timezone converter for the Omarchy bar.",
   "kinds": ["bar-widget"],

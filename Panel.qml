@@ -1,13 +1,14 @@
 import QtQuick
 import Quickshell
+import Quickshell.Io
 import qs.Commons
 import qs.Ui
 import "Model.js" as Model
 
 Panel {
   id: root
-  moduleName: "io.github.leomoon-studios.world-clock"
-  ipcTarget: "io.github.leomoon-studios.world-clock"
+  moduleName: "leomoon-studios.omarchy-world-clock"
+  ipcTarget: "leomoon-studios.omarchy-world-clock"
   manageIpc: false
 
   property var anchorItem: null
@@ -28,6 +29,87 @@ Panel {
   property int cursorRow: 0
   property int cursorColumn: 0
   property bool editorActive: false
+  property bool pendingOpen: false
+
+  // Plugin settings belong to the plugin. Bar layout changes may rewrite
+  // shell.json, so never use its inline widget entry as a settings backend.
+  property var durableSettings: ({
+    locations: [{ label: "UTC", timezone: "UTC" }],
+    hourFormat: "24",
+    showAbbreviation: true,
+    showUtcOffset: false,
+    showTodayDate: false
+  })
+  property bool durableSettingsLoaded: false
+  property bool settingsDirectoryReady: false
+  readonly property string durableSettingsDirectory: Quickshell.env("HOME") + "/.config/" + moduleName
+  readonly property string durableSettingsPath: durableSettingsDirectory + "/settings.json"
+
+  Process {
+    id: settingsDirectoryCreator
+    command: ["/usr/bin/mkdir", "-p", root.durableSettingsDirectory]
+    onExited: function(exitCode) {
+      if (exitCode !== 0) {
+        console.warn(root.moduleName + ": unable to create settings directory")
+        return
+      }
+      root.settingsDirectoryReady = true
+      durableSettingsFile.reload()
+    }
+  }
+
+  FileView {
+    id: durableSettingsFile
+    path: root.durableSettingsPath
+    watchChanges: true
+    atomicWrites: true
+    printErrors: false
+    onLoaded: root.loadDurableSettings(text())
+    onFileChanged: reload()
+    onLoadFailed: if (root.settingsDirectoryReady) root.bootstrapDurableSettings()
+  }
+
+  Component.onCompleted: settingsDirectoryCreator.running = true
+
+  function settingsObject(value) {
+    return value && typeof value === "object" && !Array.isArray(value) ? value : ({})
+  }
+
+  function loadDurableSettings(raw) {
+    var parsed = null
+    try {
+      parsed = JSON.parse(String(raw || ""))
+    } catch (e) {
+      parsed = null
+    }
+    if (parsed && parsed.version === 1 && parsed.settings)
+      durableSettings = settingsObject(parsed.settings)
+    else
+      bootstrapDurableSettings()
+    durableSettingsLoaded = true
+    finishPendingOpen()
+  }
+
+  function bootstrapDurableSettings() {
+    durableSettingsLoaded = true
+    durableSettingsFile.setText(JSON.stringify({ version: 1, settings: durableSettings }, null, 2) + "\n")
+    finishPendingOpen()
+  }
+
+  function saveDurableSettings(value) {
+    durableSettingsFile.setText(JSON.stringify({ version: 1, settings: value }, null, 2) + "\n")
+  }
+
+  function setting(name, fallback) {
+    var value = durableSettings[name]
+    return value === undefined || value === null ? fallback : value
+  }
+
+  function finishPendingOpen() {
+    if (!pendingOpen || !durableSettingsLoaded) return
+    pendingOpen = false
+    open()
+  }
 
   function modeIndex() {
     if (mode === "convert") return 1
@@ -152,6 +234,10 @@ Panel {
   readonly property string systemDate: Qt.formatDateTime(new Date(), "yyyy-MM-dd")
 
   function open() {
+    if (!durableSettingsLoaded) {
+      pendingOpen = true
+      return
+    }
     mode = "clocks"
     cursorActive = false
     tabIndex = 0
@@ -171,13 +257,12 @@ Panel {
   }
 
   function persistSettings(values) {
-    var entry = { id: moduleName }
-    for (var existing in settings) if (existing !== "id") entry[existing] = settings[existing]
-    for (var key in values) entry[key] = values[key]
-    settings = entry
-    if (hostWidget && "settings" in hostWidget) hostWidget.settings = entry
-    if (bar && bar.shell && typeof bar.shell.updateEntryInline === "function")
-      bar.shell.updateEntryInline(moduleName, entry)
+    var nextDurable = ({})
+    for (var existing in durableSettings) nextDurable[existing] = durableSettings[existing]
+    for (var key in values) nextDurable[key] = values[key]
+    durableSettings = nextDurable
+    durableSettingsLoaded = true
+    saveDurableSettings(nextDurable)
   }
 
   function enterSettings() {

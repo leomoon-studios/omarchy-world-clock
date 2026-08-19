@@ -29,32 +29,24 @@ The manifest places the widget in the right bar section by default. Move it if
 desired:
 
 ```bash
-omarchy bar move io.github.leomoon-studios.world-clock --section right --after omarchy.tray
+omarchy bar move leomoon-studios.omarchy-world-clock --section right --after omarchy.tray
 ```
 
 ## Automation
 
-Locations and display settings live inline in `~/.config/omarchy/shell.json`.
-Use the plugin's **Settings** panel to add, remove, reorder, or rename
-locations. This is the supported way to manage the location array.
+Locations and display settings are owned by the plugin and saved at
+`~/.config/leomoon-studios.omarchy-world-clock/settings.json`
+so bar layout changes cannot reset the saved locations. Use the plugin's
+**Settings** panel to add, remove, reorder, or rename locations.
 
-Scalar display preferences can also be automated with Omarchy commands:
-
-```bash
-omarchy bar set io.github.leomoon-studios.world-clock hourFormat 24
-omarchy bar set io.github.leomoon-studios.world-clock showAbbreviation true --json
-omarchy bar set io.github.leomoon-studios.world-clock showUtcOffset false --json
-```
-
-> Current Omarchy IPC releases cannot pass a JSON array through
-> `omarchy bar set … locations … --json`; do not use that command for
-> locations.
+The `shell.json` bar entry controls placement only; it is not used for plugin
+settings.
 
 ## Security and privacy
 
 The plugin performs no network access and stores no secrets. It runs only fixed
-command arrays using `/usr/bin/env`, `/usr/bin/date`, `/usr/bin/readlink`, and
-`/usr/bin/cat`. It
+command arrays using `/usr/bin/env`, `/usr/bin/date`, `/usr/bin/readlink`,
+`/usr/bin/cat`, and `/usr/bin/mkdir`. It
 does not invoke a shell interpreter, request root access, or accept a custom
 executable path. Timezone data comes from the system's
 `/usr/share/zoneinfo/iso3166.tab`, `zone.tab`, and `tzdata.zi` from installed

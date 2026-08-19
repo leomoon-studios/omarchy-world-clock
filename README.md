@@ -6,6 +6,10 @@ The bar stays minimal with a single world glyph. Clicking it opens a native,
 theme-aware Omarchy panel where you can view clocks, convert a future meeting
 time, and manage locations.
 
+## Preview
+
+![Omarchy World Clock preview](preview.png)
+
 ## Features
 
 - Live clocks for up to 20 configured IANA timezones

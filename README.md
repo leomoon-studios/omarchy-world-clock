@@ -32,6 +32,18 @@ desired:
 omarchy bar move leomoon-studios.omarchy-world-clock --section right --after omarchy.tray
 ```
 
+## Remove
+
+```bash
+omarchy plugin remove leomoon-studios.omarchy-world-clock --yes
+```
+
+Saved locations and display preferences are retained. To remove them too:
+
+```bash
+rm -r -- "$HOME/.config/leomoon-studios.omarchy-world-clock"
+```
+
 ## Automation
 
 Locations and display settings are owned by the plugin and saved at

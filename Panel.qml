@@ -279,12 +279,12 @@ Panel {
   function replaceDraft(next) { draftLocations = Model.cloneLocations(next) }
 
   function addDraftLocation() {
-    var label = addLabel.text.trim()
     var timezone = newLocationTimezone
-    if (!label || timezoneService.validZones.indexOf(timezone) === -1) {
-      settingsError = "Enter a label and select a timezone."
+    if (timezoneService.validZones.indexOf(timezone) === -1) {
+      settingsError = "Select a valid timezone."
       return
     }
+    var label = addLabel.text.trim() || Model.defaultLabelForTimezone(timezone)
     if (draftLocations.length >= 20) {
       settingsError = "A maximum of 20 locations is supported."
       return
@@ -631,27 +631,65 @@ Panel {
               model: timezoneService.conversionResults
               Column {
                 required property var modelData
+                required property int index
                 width: parent.width
                 spacing: Style.space(2)
-                Text {
+                Row {
                   width: parent.width
-                  text: modelData.result
-                    ? modelData.label + "    " + modelData.result.weekday + " " + modelData.result.date
-                      + " " + Model.formatClock(modelData.result, root.hourFormat)
-                      + (root.showAbbreviation ? " " + modelData.result.abbreviation : "")
-                    : modelData.label + "    " + modelData.error
-                  color: root.contentForeground
-                  font.family: root.contentFontFamily
-                  font.pixelSize: Style.font.body
-                  wrapMode: Text.Wrap
+                  visible: modelData.result !== null
+                  Text {
+                    width: parent.width * 0.48
+                    text: modelData.label
+                    color: root.contentForeground
+                    font.family: root.contentFontFamily
+                    font.pixelSize: Style.font.body
+                    elide: Text.ElideRight
+                  }
+                  Text {
+                    width: parent.width * 0.30
+                    text: Model.formatClock(modelData.result, root.hourFormat)
+                    color: root.contentForeground
+                    font.family: root.contentFontFamily
+                    font.pixelSize: Style.font.subtitle
+                    font.bold: true
+                    horizontalAlignment: Text.AlignRight
+                  }
+                  Text {
+                    width: parent.width * 0.22
+                    text: root.showAbbreviation ? modelData.result.abbreviation : ""
+                    color: root.contentForeground
+                    opacity: 0.65
+                    font.family: root.contentFontFamily
+                    font.pixelSize: Style.font.bodySmall
+                    horizontalAlignment: Text.AlignRight
+                  }
                 }
                 Text {
+                  width: parent.width
                   visible: modelData.result !== null
-                  text: modelData.result ? Model.conversionDay(timezoneService.conversionSourceDate, modelData.result.date) : ""
+                  text: modelData.result
+                    ? modelData.result.weekday + " " + modelData.result.date
+                      + " · " + Model.conversionDay(timezoneService.conversionSourceDate, modelData.result.date)
+                    : ""
                   color: root.contentForeground
                   opacity: 0.55
                   font.family: root.contentFontFamily
                   font.pixelSize: Style.font.caption
+                }
+                Text {
+                  width: parent.width
+                  visible: modelData.result === null
+                  text: modelData.label + " · " + modelData.error
+                  color: root.contentForeground
+                  opacity: 0.75
+                  font.family: root.contentFontFamily
+                  font.pixelSize: Style.font.bodySmall
+                  wrapMode: Text.Wrap
+                }
+                PanelSeparator {
+                  width: parent.width
+                  foreground: root.contentForeground
+                  visible: index < timezoneService.conversionResults.length - 1
                 }
               }
             }
@@ -670,8 +708,10 @@ Panel {
             Row {
               width: parent.width
               spacing: Style.space(6)
+              readonly property real actionsWidth: Style.space(22) * 3
+              readonly property real fieldsWidth: width - actionsWidth - spacing * 4
               Text {
-                width: parent.width * 0.42
+                width: parent.fieldsWidth * 0.58
                 text: "TIMEZONE"
                 color: root.contentForeground
                 opacity: 0.55
@@ -679,7 +719,7 @@ Panel {
                 font.pixelSize: Style.font.caption
               }
               Text {
-                width: parent.width * 0.30
+                width: parent.fieldsWidth * 0.42
                 text: "ALIAS"
                 color: root.contentForeground
                 opacity: 0.55

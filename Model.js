@@ -13,6 +13,11 @@ function defaultLocations(systemTimezone) {
   return [{ label: "UTC", timezone: "UTC" }]
 }
 
+function defaultLabelForTimezone(timezone) {
+  var parts = String(timezone || "").trim().split("/")
+  return (parts[parts.length - 1] || "UTC").replace(/_/g, " ")
+}
+
 function sanitizeLocations(value, validZones, systemTimezone) {
   var source = Array.isArray(value) ? value : []
   var result = []
@@ -78,6 +83,7 @@ if (typeof module !== "undefined") {
     defaultLocations: defaultLocations,
     sanitizeLocations: sanitizeLocations,
     cloneLocations: cloneLocations,
+    defaultLabelForTimezone: defaultLabelForTimezone,
     dateDifference: dateDifference,
     relativeDay: relativeDay,
     conversionDay: conversionDay,

@@ -372,6 +372,7 @@ Panel {
   TimezoneService {
     id: timezoneService
     locations: root.configuredLocations
+    active: root.opened
   }
 
   KeyboardPanel {

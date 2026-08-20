@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "leomoon-studios.omarchy-world-clock",
   "name": "Omarchy World Clock",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "author": "LeoMoon Studios",
   "license": "MIT",
   "description": "An offline world clock and timezone converter for the Omarchy bar.",

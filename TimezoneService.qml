@@ -11,6 +11,7 @@ Item {
   property var timezoneOptions: [{ value: "UTC", label: "UTC", description: "Coordinated Universal Time" }]
   property string systemTimezone: "UTC"
   property bool refreshing: false
+  property bool active: false
   property string lastError: ""
 
   property var queue: []
@@ -279,7 +280,7 @@ Item {
     id: minuteTimer
     interval: 60000 - (Date.now() % 60000) + 100
     repeat: false
-    running: true
+    running: false
     onTriggered: {
       root.refresh()
       interval = 60000
@@ -287,9 +288,17 @@ Item {
     }
   }
 
+  onActiveChanged: {
+    if (active) {
+      minuteTimer.interval = 60000 - (Date.now() % 60000) + 100
+      minuteTimer.restart()
+    } else {
+      minuteTimer.stop()
+    }
+  }
+
   Component.onCompleted: {
     loadSystemTimezone()
     loadZones()
-    refresh()
   }
 }

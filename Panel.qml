@@ -657,7 +657,9 @@ Panel {
                   }
                   Text {
                     width: parent.width * 0.22
-                    text: root.showAbbreviation ? modelData.result.abbreviation : ""
+                    text: root.showAbbreviation && modelData.result
+                      ? modelData.result.abbreviation
+                      : ""
                     color: root.contentForeground
                     opacity: 0.65
                     font.family: root.contentFontFamily

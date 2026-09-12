@@ -385,6 +385,18 @@ Panel {
     contentWidth: panel.fittedContentWidth(Style.space(500))
     contentHeight: panel.fittedContentHeight(Math.min(content.implicitHeight, Style.space(720)))
 
+    // Installed plugins only see their own registered click targets. Keep the
+    // physical bar outside this popup's input region so the real bar receives
+    // clicks and performs its normal one-click panel handoff.
+    mask: Region {
+      x: panel.barPos === "left" ? panel.barW : 0
+      y: panel.barPos === "top" ? panel.barH : 0
+      width: Math.max(0, panel.screenW
+        - ((panel.barPos === "left" || panel.barPos === "right") ? panel.barW : 0))
+      height: Math.max(0, panel.screenH
+        - ((panel.barPos === "top" || panel.barPos === "bottom") ? panel.barH : 0))
+    }
+
     PanelKeyCatcher {
       id: keyCatcher
       anchors.fill: parent
